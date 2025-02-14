@@ -293,7 +293,7 @@
 		gwStufeSelect.innerHTML = "";
 
 		// Gewinnstufen für Grand, Kreuz, Pik, Herz, Karo
-		let standardGewinnstufen = ["Einfach", "Hand", "Schneider", "Hand Schneider", "Schwarz", "Hand Schwarz", "Schneider Ang.", "Schwarz Ang.", "Ouvert"];
+		let standardGewinnstufen = ["Einfach", "Hand", "Schneider", "Hand Schneider", "Schwarz", "Hand Schwarz", "Schneider Ang.", "Schn. Ang. Schw.","Schwarz Ang.", "Ouvert"];
 		// Gewinnstufen für Null
 		let nullGewinnstufen = ["Einfach", "Hand", "Ouvert", "Hand Ouvert"];
 
@@ -331,7 +331,7 @@
 			mitBubeSelect.innerHTML = "";
 			gwStufeSelect.innerHTML = "";
 
-			let standardGewinnstufen = ["Einfach", "Hand", "Schneider", "Hand Schneider", "Schwarz", "Hand Schwarz", "Schneider Ang.", "Schwarz Ang.", "Ouvert"];
+			let standardGewinnstufen = ["Einfach", "Hand", "Schneider", "Hand Schneider", "Schwarz", "Hand Schwarz", "Schneider Ang.", "Schn. Ang. Schw.", "Schwarz Ang.", "Ouvert"];
 			let nullGewinnstufen = ["Einfach", "Hand", "Ouvert", "Hand Ouvert"];
 
 			if (gameType === "Grand") {
@@ -424,6 +424,7 @@
 				"Hand Schneider": 3,
 				"Hand Schwarz": 4,
 				"Schneider Ang.": 4,
+				"Schn. Ang. Schw.": 5,
 				"Schwarz Ang.": 6,
 				"Ouvert": 7
 			};			
