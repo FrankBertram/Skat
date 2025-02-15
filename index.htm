@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Spielstand-Tabelle</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { width: 90%; margin: 20px auto; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 10px; text-align: center; min-width: 60px; }
+        th { background-color: lightgray; }
+        button { margin: 10px; padding: 8px 15px; cursor: pointer; }
+        .win-btn { background-color: green; color: white; }
+        .lose-btn { background-color: red; color: white; }
+        .delete-btn { background-color: gray; color: white; }
+        .sum-row { font-weight: bold; background-color: #f0f0f0; }
+        .small-col { width: 30px; }
+    </style>
+</head>
+<body>
+
+    <h2 id="gameHeader">Eingabe für Spiel 1</h2>
+
+    <form id="gameForm">
+        <label>Spieler:
+            <select id="player"></select>
+        </label>
+
+        <label>Farbe:
+            <select id="color">
+                <option value="GRAND">GRAND</option>
+                <option value="Kreuz">Kreuz</option>
+                <option value="Pik">Pik</option>
+                <option value="Herz">Herz</option>
+                <option value="Karo">Karo</option>
+                <option value="NULL">NULL</option>
+            </select>
+        </label>
+
+        <button type="button" class="win-btn" onclick="addEntry(true)">Gewonnen</button>
+        <button type="button" class="lose-btn" onclick="addEntry(false)">Verloren</button>
+        <button type="button" class="delete-btn" onclick="removeLastEntry()">Letzten Eintrag löschen</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="small-col">Nr</th>
+                <th colspan="3">Frank</th>
+                <th colspan="3">Klaus</th>
+                <th colspan="3">Peter</th>
+                <th colspan="3">Bodo</th>
+            </tr>
+            <tr>
+                <th class="small-col"></th>
+                <th>Punkte</th><th class="small-col">G</th><th class="small-col">V</th>
+                <th>Punkte</th><th class="small-col">G</th><th class="small-col">V</th>
+                <th>Punkte</th><th class="small-col">G</th><th class="small-col">V</th>
+                <th>Punkte</th><th class="small-col">G</th><th class="small-col">V</th>
+            </tr>
+        </thead>
+        <tbody id="gameTableBody"></tbody>
+        <tfoot>
+            <tr class="sum-row">
+                <td>Summe</td>
+                <td id="sumFrank">0</td><td id="sumGFrank">0</td><td id="sumVFrank">0</td>
+                <td id="sumKlaus">0</td><td id="sumGKlaus">0</td><td id="sumVKlaus">0</td>
+                <td id="sumPeter">0</td><td id="sumGPeter">0</td><td id="sumVPeter">0</td>
+                <td id="sumBodo">0</td><td id="sumGBodo">0</td><td id="sumVBodo">0</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <script>
+        let entries = [];
+        let gameNumber = 1;
+        const players = ["Frank", "Klaus", "Peter", "Bodo"];
+        const colorValues = { GRAND: 24, Kreuz: 12, Pik: 11, Herz: 10, Karo: 9, NULL: 23 };
+        const totalPoints = { Frank: 0, Klaus: 0, Peter: 0, Bodo: 0 };
+        const totalWins = { Frank: 0, Klaus: 0, Peter: 0, Bodo: 0 };
+        const totalLosses = { Frank: 0, Klaus: 0, Peter: 0, Bodo: 0 };
+
+        function updatePlayerOptions() {
+            const select = document.getElementById("player");
+            select.innerHTML = "";
+            const gameMod = (gameNumber - 1) % 4;
+            const allowedPlayers = players.filter((_, index) => index !== gameMod);
+            allowedPlayers.forEach(player => {
+                const option = document.createElement("option");
+                option.value = player;
+                option.textContent = player;
+                select.appendChild(option);
+            });
+        }
+
+        function updateGameHeader() {
+            document.getElementById("gameHeader").textContent = `Eingabe für Spiel ${gameNumber}`;
+        }
+
+        function addEntry(won) {
+            const player = document.getElementById("player").value;
+            const color = document.getElementById("color").value;
+            const value = colorValues[color];
+            const finalValue = won ? value : -2 * value;
+
+            entries.push({ game: gameNumber, player, value: finalValue, won });
+            totalPoints[player] += finalValue;
+            if (won) totalWins[player]++; else totalLosses[player]++;
+
+            renderTable();
+            gameNumber++;
+            updatePlayerOptions();
+            updateGameHeader();
+        }
+
+        function removeLastEntry() {
+            if (entries.length === 0) return;
+
+            const lastEntry = entries.pop();
+            totalPoints[lastEntry.player] -= lastEntry.value;
+            if (lastEntry.won) totalWins[lastEntry.player]--; else totalLosses[lastEntry.player]--;
+
+            gameNumber--;
+            renderTable();
+            updatePlayerOptions();
+            updateGameHeader();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById("gameTableBody");
+            tbody.innerHTML = "";
+            let rowIndex = 1;
+
+            entries.forEach(entry => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${rowIndex}</td>`;
+                players.forEach(player => {
+                    if (player === entry.player) {
+                        row.innerHTML += `<td>${totalPoints[player]}</td>
+                                          <td>${totalWins[player]}</td>
+                                          <td>${totalLosses[player]}</td>`;
+                    } else {
+                        row.innerHTML += `<td></td><td></td><td></td>`;
+                    }
+                });
+                tbody.appendChild(row);
+                rowIndex++;
+            });
+
+            document.getElementById("sumFrank").textContent = totalPoints.Frank;
+            document.getElementById("sumGFrank").textContent = totalWins.Frank;
+            document.getElementById("sumVFrank").textContent = totalLosses.Frank;
+
+            document.getElementById("sumKlaus").textContent = totalPoints.Klaus;
+            document.getElementById("sumGKlaus").textContent = totalWins.Klaus;
+            document.getElementById("sumVKlaus").textContent = totalLosses.Klaus;
+
+            document.getElementById("sumPeter").textContent = totalPoints.Peter;
+            document.getElementById("sumGPeter").textContent = totalWins.Peter;
+            document.getElementById("sumVPeter").textContent = totalLosses.Peter;
+
+            document.getElementById("sumBodo").textContent = totalPoints.Bodo;
+            document.getElementById("sumGBodo").textContent = totalWins.Bodo;
+            document.getElementById("sumVBodo").textContent = totalLosses.Bodo;
+        }
+
+        updatePlayerOptions();
+    </script>
+
+</body>
+</html>
