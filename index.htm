@@ -27,13 +27,21 @@
 			white-space: nowrap; /* Verhindert Zeilenumbrüche */
 		}
 		.small-col-p {
+			width: 60px !important;  
+			min-width: 60px !important;
+			max-width: 60px !important;
+			text-align: center;
+			overflow: hidden;  /* Verhindert, dass Text die Spalte vergrößert */
+			white-space: nowrap; /* Verhindert Zeilenumbrüche */
+		}		
+		.small-col-s {
 			width: 50px !important;  
 			min-width: 50px !important;
 			max-width: 50px !important;
 			text-align: center;
 			overflow: hidden;  /* Verhindert, dass Text die Spalte vergrößert */
 			white-space: nowrap; /* Verhindert Zeilenumbrüche */
-		}		
+		}		    
 		
 		
 		.shaded {
@@ -251,7 +259,7 @@
                 </tr>
                 <tr>
                     <th class="small-col"></th>
-                    <th class="small-col-p"></th><th></th><th></th><th></th>
+                    <th class="small-col-s"></th><th></th><th></th><th></th>
                     <th class="small-col">+</th><th class="small-col">-</th>
                     <th class="small-col-p">Punkte</th><th class="small-col">G</th><th class="small-col">V</th>
                     <th class="small-col-p">Punkte</th><th class="small-col">G</th><th class="small-col">V</th>
