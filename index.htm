@@ -34,6 +34,7 @@
 			overflow: hidden;  /* Verhindert, dass Text die Spalte vergrößert */
 			white-space: nowrap; /* Verhindert Zeilenumbrüche */
 		}		
+		
 		.small-col-s {
 			width: 50px !important;  
 			min-width: 50px !important;
@@ -41,8 +42,7 @@
 			text-align: center;
 			overflow: hidden;  /* Verhindert, dass Text die Spalte vergrößert */
 			white-space: nowrap; /* Verhindert Zeilenumbrüche */
-		}		    
-		
+		}	
 		
 		.shaded {
 			background: repeating-linear-gradient(
@@ -166,36 +166,36 @@
 			<img src="Skat.png" alt="Vereinslogo" style="width: 50px; height: 50px; margin-right: 15px;">
 			Spieler-Auswahl & Skatrunde starten
 		</h1>
-        <h2>Bitte 4 Spieler auswählen:</h2> 
+        <h2 style="text-align: left;">Bitte 4 Spieler auswählen:</h2>
         <div id="playerSelection"></div>
         <button onclick="startGame()">Skatrunde starten</button>
     </div>
-	<div id="settings" style="position: absolute; right: 20px; top: 100px; text-align: left;">
-		<h3>Spieloptionen</h3>
+	<div id="settings" style="position: absolute; right: 50px; top: 100px; text-align: left;">
+		<h2>Spieloptionen</h2> 
 		<form>
-			<label>Datum: <input type="date" id="spielDatum" value="2024-02-15"></label><br><br>
+			<label style="font-size: 1.5em;">Datum: <input type="date" id="spielDatum" value="2024-02-15" style="font-size: 1.0em;"></label><br><br>
 			</br>
-			<fieldset>
+			<fieldset style="font-size: 1.5em;">
 				<legend>Anzahl der Spiele</legend>
-				<label><input type="radio" name="spiele" value="12"> 12 Spiele</label><br>
+				<label><input type="radio" name="spiele" value="12"> 12 Spiele</label>
 				<label><input type="radio" name="spiele" value="24"> 24 Spiele</label><br>
-				<label><input type="radio" name="spiele" value="36" checked> 36 Spiele</label><br>
+				<label><input type="radio" name="spiele" value="36" checked> 36 Spiele</label>
 				<label><input type="radio" name="spiele" value="48"> 48 Spiele</label>
 			</fieldset>
 			</br>
-			<fieldset>
+			<fieldset style="font-size: 1.5em;">
 				<legend>Serie</legend>
-				<label><input type="radio" name="serie" value="1" checked> Serie 1</label><br>
+				<label><input type="radio" name="serie" value="1" checked> Serie 1</label>
 				<label><input type="radio" name="serie" value="2"> Serie 2</label>
 			</fieldset>
 			</br>
-			<fieldset>
+			<fieldset style="font-size: 1.5em;">
 				<legend>Tisch</legend>
-				<label><input type="radio" name="tisch" value="1" checked> Tisch 1</label><br>
+				<label><input type="radio" name="tisch" value="1" checked> Tisch 1</label>
 				<label><input type="radio" name="tisch" value="2"> Tisch 2</label><br>
-				<label><input type="radio" name="tisch" value="3"> Tisch 3</label><br>
+				<label><input type="radio" name="tisch" value="3"> Tisch 3</label>
 				<label><input type="radio" name="tisch" value="4"> Tisch 4</label><br>
-				<label><input type="radio" name="tisch" value="5"> Tisch 5</label><br>
+				<label><input type="radio" name="tisch" value="5"> Tisch 5</label>
 				<label><input type="radio" name="tisch" value="6"> Tisch 6</label>
 			</fieldset>
 		</form>
@@ -246,7 +246,7 @@
             <thead>
                 <tr>
                     <th class="small-col">Nr</th>
-                    <th>Spielart</th>
+                    <th class="small-col-s">Spielart</th>
                     <th class="small-col">mit</th>
                     <th class="small-col">oh.</th>
                     <th>Stufe</th>
@@ -571,10 +571,10 @@
 
 				if (gameType !== "Eingepasst") {
 				row.innerHTML = `<td>${gameNumber}</td>  <!-- Spalte 1: Spielnummer -->
-								 <td>${gameType === "Pik" ? '<img src="pik.jpg" alt="Pik" width="15" height="15">' : 
-									  gameType === "Herz" ? '<img src="Herz.jpg" alt="Herz" width="15" height="15">' : 
-									  gameType === "Karo" ? '<img src="Karo.jpg" alt="Karo" width="15" height="15">' : 
-									  gameType === "Kreuz" ? '<img src="kreuz.jpg" alt="Kreuz" width="15" height="15">' : 
+								 <td>${gameType === "Pik" ? '<img src="pik.jpg" alt="Pik" width="18" height="14">' : 
+									  gameType === "Herz" ? '<img src="Herz.jpg" alt="Herz" width="18" height="14">' : 
+									  gameType === "Karo" ? '<img src="Karo.jpg" alt="Karo" width="18" height="14">' : 
+									  gameType === "Kreuz" ? '<img src="kreuz.jpg" alt="Kreuz" width="18" height="14">' : 
 									  gameType === "Grand" ? 'G' : 
 									  gameType === "Null" ? 'N' : gameType}</td>     <!-- Spalte 2: Spielart -->
 								 <td>${spalte3}</td>      <!-- Spalte 3: mitX -->
