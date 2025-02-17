@@ -6,6 +6,7 @@
 	<link rel="icon" type="image/png" href="Skat.png">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>	
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         .hidden { display: none; }
@@ -234,7 +235,7 @@
             <button type="button" class="win-btn" onclick="addEntry(true)">Gewonnen</button>
             <button type="button" class="lose-btn" onclick="addEntry(false)">Verloren</button>
             <button type="button" class="delete-btn" onclick="removeLastEntry()">letzten Eintrag löschen</button>
-			<button id="excelExportButton" class="hidden" onclick="exportToExcel()">XLS Export</button>			
+			<button id="excelExportButton" class="hidden" onclick="exportToExcel()">CSV Export</button>			
         </form>
 		</br>
 		<div id="tableInfo" style="text-align: left; margin-left: 20px; margin-bottom: 5px;">
@@ -633,27 +634,62 @@
 			
 		}
 		
-		    function exportToExcel() {
-				let table = document.querySelector("table");
-				let rows = table.rows;
-				let csvContent = "";
+		function exportToExcel() {
+			let table = document.querySelector("table");
+			let rows = table.rows;
+			let csvContent = "\ufeff"; // UTF-8 BOM für korrekte Zeichenkodierung
 
-				for (let i = 0; i < rows.length; i++) {
-					let row = [], cols = rows[i].cells;
-					for (let j = 0; j < cols.length; j++) {
-						row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+			for (let i = 0; i < rows.length; i++) {
+				let row = [], cols = rows[i].cells;
+				
+				for (let j = 0; j < cols.length; j++) {
+					let cellText = cols[j].innerText.replace(/"/g, '""');
+					
+					// Falls die Spalte die Spielart enthält, überprüfe das Bild
+					if (j === 1) { // Annahme: Spielart steht in der ersten Spalte
+						let img = cols[j].querySelector("img");
+						if (img) {
+							let imgSrc = img.src.toLowerCase();
+							if (imgSrc.includes("pik.jpg")) cellText = "11";
+							else if (imgSrc.includes("kreuz.jpg")) cellText = "12";
+							else if (imgSrc.includes("karo.jpg")) cellText = "9";
+							else if (imgSrc.includes("herz.jpg")) cellText = "10";
+						} else {
+							let textContent = cellText.trim().toUpperCase();
+							if (textContent === "G") cellText = "24";
+							else if (textContent === "N") cellText = "23";
+							else if (textContent === "E") cellText = "0";
+						}
 					}
-					csvContent += row.join(";") + "\n";
+					
+					row.push('"' + cellText + '"');
+					
+					// Zusätzliche Leerzellen in der Kopfzeile hinzufügen
+					if (i === 0) { // Falls es die Kopfzeile ist
+						if (j === 5) row.push('""'); // Nach Spalte 6 eine Leerspalte
+						if (j === 6 || j === 7 || j === 8 || j === 9) row.push('""', '""'); // Nach Spalte 7-10 je zwei Leerspalten
+					}
 				}
-
-				let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-				let link = document.createElement("a");
-				link.href = URL.createObjectURL(blob);
-				link.download = "Spielergebnisse.csv";
-				document.body.appendChild(link);
-				link.click();
-				document.body.removeChild(link);
+				
+				csvContent += row.join(";") + "\n";
 			}
+
+			let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+			let link = document.createElement("a");
+			// Werte für den Dateinamen aus dem HTML-Dokument holen
+			let selectedDate = document.getElementById("selectedDate").textContent.trim();
+			let selectedSerie = document.getElementById("selectedSerie").textContent.trim();
+			let selectedTable = document.getElementById("selectedTable").textContent.trim();
+			let filename = `Skatliste_${selectedDate}_S${selectedSerie}_T${selectedTable}.csv`;
+			link.href = URL.createObjectURL(blob);
+			link.download = filename;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		}
+
+
+
 
 		async function exportToPDF() {
 			const { jsPDF } = window.jspdf;
@@ -702,6 +738,81 @@
 			doc.save("Spielergebnisse.pdf");
 		}
 
+		async function exportToExcelFile() {
+			const fileName = "4erListe.xlsx"; // Datei im Root-Verzeichnis
+
+			try {
+				// Datei vom gleichen Verzeichnis laden
+				const response = await fetch(fileName);
+				if (!response.ok) throw new Error("Excel-Datei konnte nicht geladen werden.");
+
+				const arrayBuffer = await response.arrayBuffer();
+				let workbook = XLSX.read(arrayBuffer, { type: "array" });
+				let sheetName = "4erListe";
+				let worksheet = workbook.Sheets[sheetName] || XLSX.utils.aoa_to_sheet([]);
+
+				let table = document.querySelector("table");
+				let rows = table.querySelectorAll("tbody tr");
+				let footerRows = table.querySelectorAll("tfoot tr");
+				let tableData = [];
+
+				let headerCells = table.querySelectorAll("thead tr th");
+				if (headerCells.length >= 9) {
+					XLSX.utils.sheet_add_aoa(worksheet, [[headerCells[6].innerText.trim()]], { origin: "E15" });
+					XLSX.utils.sheet_add_aoa(worksheet, [[headerCells[7].innerText.trim()]], { origin: "E18" });
+					XLSX.utils.sheet_add_aoa(worksheet, [[headerCells[8].innerText.trim()]], { origin: "E21" });
+					XLSX.utils.sheet_add_aoa(worksheet, [[headerCells[9].innerText.trim()]], { origin: "E24" });
+				}
+
+				rows.forEach(row => {
+					let rowData = [];
+					row.querySelectorAll("td").forEach((cell, index) => {
+						if (index === 1) rowData[2] = cell.innerText.trim();
+						else if (index === 2 || index === 3) rowData[index + 2] = cell.innerText.trim();
+						else if (index === 4) {
+							if (cell.innerText.trim() === "Hand") rowData[6] = "X";
+							else if (cell.innerText.trim() === "Ouvert") for (let i = 6; i <= 11; i++) rowData[i] = "X";
+							else if (cell.innerText.trim() === "Schneider") rowData[7] = "X";
+							else if (cell.innerText.trim() === "Schwarz") { rowData[7] = "X"; rowData[9] = "X"; }
+						} else if (index >= 5 && index <= 19) rowData[index + 5] = cell.innerText.trim();
+					});
+					tableData.push(rowData);
+				});
+
+				if (footerRows.length > 0) {
+					let firstFooterRow = footerRows[0].querySelectorAll("td");
+					let rowData = [];
+					firstFooterRow.forEach((cell, index) => {
+						if (index >= 5 && index <= 19) rowData[index + 6] = cell.innerText.trim();
+					});
+					XLSX.utils.sheet_add_aoa(worksheet, [rowData], { origin: "K43" });
+				}
+
+				XLSX.utils.sheet_add_aoa(worksheet, tableData, { origin: "K7" });
+				workbook.Sheets[sheetName] = worksheet;
+
+				let updatedWorkbook = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+				let blob = new Blob([updatedWorkbook], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+				let downloadLink = document.createElement("a");
+				downloadLink.href = URL.createObjectURL(blob);
+				downloadLink.download = fileName;
+				document.body.appendChild(downloadLink);
+				downloadLink.click();
+				document.body.removeChild(downloadLink);
+
+				// Öffne die Datei automatisch (nur für lokale Datei)
+				setTimeout(() => {
+					window.open(downloadLink.href);
+				}, 1000);
+
+			} catch (error) {
+				console.error("Fehler beim Laden der Excel-Datei:", error);
+			}
+		}
+
+
+
 
 
 
@@ -709,7 +820,7 @@
 		function checkGameEnd() {
 			if (gameNumber > totalGames) {
 				document.getElementById("gameHeader").textContent = "Spielende";
-				<!-- document.getElementById("excelExportButton").classList.remove("hidden");
+				document.getElementById("excelExportButton").classList.remove("hidden");
 			}
 		}		
 
