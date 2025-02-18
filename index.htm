@@ -327,7 +327,8 @@
 			gameTypeSelect.value = "Grand"; // Standardmäßig auf "Grand" setzen
 			updateSelections("Grand"); // Direkt die richtigen Auswahlmöglichkeiten setzen
 		});		
-		// Spielart-Änderung erkennen
+		document.addEventListener("DOMContentLoaded", updateDate);		
+	    // Spielart-Änderung erkennen
 		document.getElementById("gameType").addEventListener("change", function () {
 			updateSelections(this.value);
 		});		
